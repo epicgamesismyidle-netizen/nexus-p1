@@ -1,0 +1,354 @@
+openapi: 3.1.0
+info:
+  title: Api
+  version: 0.1.0
+  description: SaaS Website API
+servers:
+  - url: /api
+    description: Base API path
+tags:
+  - name: health
+    description: Health operations
+  - name: auth
+    description: Authentication operations
+  - name: payments
+    description: Payment operations
+  - name: user
+    description: User operations
+paths:
+  /healthz:
+    get:
+      operationId: healthCheck
+      tags: [health]
+      summary: Health check
+      description: Returns server health status
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
+  /auth/signup:
+    post:
+      operationId: signup
+      tags: [auth]
+      summary: Create a new user account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SignupRequest"
+      responses:
+        "201":
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Username already taken
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/login:
+    post:
+      operationId: login
+      tags: [auth]
+      summary: Login with username and password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /auth/logout:
+    post:
+      operationId: logout
+      tags: [auth]
+      summary: Logout and clear session
+      responses:
+        "200":
+          description: Logged out
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+  /auth/me:
+    get:
+      operationId: getMe
+      tags: [auth]
+      summary: Get current logged in user
+      responses:
+        "200":
+          description: Current user
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /user/settings:
+    put:
+      operationId: updateSettings
+      tags: [user]
+      summary: Update username or password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSettingsRequest"
+      responses:
+        "200":
+          description: Settings updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Username already taken
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /payments/create:
+    post:
+      operationId: createPayment
+      tags: [payments]
+      summary: Create a NOWPayments invoice
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePaymentRequest"
+      responses:
+        "200":
+          description: Payment invoice created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreatePaymentResponse"
+        "400":
+          description: Invalid plan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "401":
+          description: Not authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /payments/callback:
+    post:
+      operationId: paymentCallback
+      tags: [payments]
+      summary: NOWPayments webhook callback
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PaymentCallbackRequest"
+      responses:
+        "200":
+          description: Callback processed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+
+components:
+  schemas:
+    HealthStatus:
+      type: object
+      properties:
+        status:
+          type: string
+      required:
+        - status
+
+    SignupRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 50
+        password:
+          type: string
+          minLength: 6
+      required:
+        - username
+        - password
+
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+        - username
+        - password
+
+    AuthResponse:
+      type: object
+      properties:
+        userId:
+          type: integer
+        username:
+          type: string
+        plan:
+          type: string
+          nullable: true
+        planExpiresAt:
+          type: string
+          format: date-time
+          nullable: true
+      required:
+        - userId
+        - username
+
+    UserProfile:
+      type: object
+      properties:
+        userId:
+          type: integer
+        username:
+          type: string
+        plan:
+          type: string
+          nullable: true
+        planExpiresAt:
+          type: string
+          format: date-time
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - userId
+        - username
+        - createdAt
+
+    UpdateSettingsRequest:
+      type: object
+      properties:
+        newUsername:
+          type: string
+          minLength: 3
+          maxLength: 50
+          nullable: true
+        currentPassword:
+          type: string
+          nullable: true
+        newPassword:
+          type: string
+          minLength: 6
+          nullable: true
+
+    CreatePaymentRequest:
+      type: object
+      properties:
+        plan:
+          type: string
+          enum: [daily, weekly, monthly, lifetime]
+      required:
+        - plan
+
+    CreatePaymentResponse:
+      type: object
+      properties:
+        invoiceUrl:
+          type: string
+        paymentId:
+          type: string
+      required:
+        - invoiceUrl
+        - paymentId
+
+    PaymentCallbackRequest:
+      type: object
+      properties:
+        payment_id:
+          type: string
+        payment_status:
+          type: string
+        order_id:
+          type: string
+        price_amount:
+          type: number
+        price_currency:
+          type: string
+        pay_amount:
+          type: number
+        pay_currency:
+          type: string
+      required:
+        - payment_id
+        - payment_status
+
+    MessageResponse:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
