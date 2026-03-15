@@ -1,0 +1,136 @@
+# Replit AI Instruction: Full SaaS Website with NOWPayments
+
+Goal:
+Create a professional SaaS website with these features:
+- Signup/login (username + password)
+- Dashboard showing current plan
+- Settings page (change username/password)
+- Pricing page integrated with NOWPayments
+- Plan options:
+    - Daily: $65
+    - Weekly: $455
+    - Monthly: $1300
+    - Lifetime: $2400
+- Telegram contact link: @naylou
+- Backend: Node.js + Express + MongoDB
+- Frontend: HTML, CSS, JavaScript
+- Clean, professional, user-friendly UI
+- Passwords must be hashed (bcrypt)
+- NOWPayments API keys must only be used server-side
+- MongoDB stores users, plans, and payment status
+
+---
+
+1. Project structure:
+
+my-saas-website/
+│
+├── server.js
+├── package.json
+├── .env           # secret keys: NOWPayments + MongoDB
+├── models/
+│   └── User.js
+├── routes/
+│   ├── auth.js
+│   └── payments.js
+└── public/
+    ├── index.html
+    ├── signup.html
+    ├── login.html
+    ├── dashboard.html
+    ├── settings.html
+    └── style.css
+
+---
+
+2. Dependencies (Node.js):
+
+- express
+- mongoose
+- bcrypt
+- dotenv
+- axios
+
+---
+
+3. .env file (never expose publicly):
+
+NOWPAYMENTS_API_KEY=YOUR_KEY_HERE
+NOWPAYMENTS_PUBLIC_KEY=YOUR_PUBLIC_KEY_HERE
+MONGO_URI=mongodb://localhost:27017/users
+
+---
+
+4. server.js:
+
+- Load .env
+- Connect MongoDB
+- Serve public/ folder
+- Use routes /api/auth and /api/payments
+- Listen on port 3000
+
+---
+
+5. models/User.js:
+
+- Fields:
+    - username (unique)
+    - password (hashed)
+    - plan
+    - created (date)
+
+---
+
+6. routes/auth.js:
+
+- POST /signup → create user with hashed password
+- POST /login → verify password, return userId
+
+---
+
+7. routes/payments.js:
+
+- POST /create-payment:
+    - Accepts plan, price, userId
+    - Calls NOWPayments API
+    - Returns invoice URL to frontend
+- POST /payment-callback:
+    - Receive webhook from NOWPayments
+    - Activate user plan in database
+
+---
+
+8. Frontend pages (public/):
+
+- signup.html → signup form
+- login.html → login form, store userId in localStorage
+- dashboard.html → show current plan + buy buttons for all 4 plans
+- settings.html → change username/password
+- index.html → landing page
+- style.css → clean design
+
+---
+
+9. Buy buttons (dashboard.html):
+
+- Daily $65 → calls /api/create-payment with price 65
+- Weekly $455 → calls /api/create-payment with price 455
+- Monthly $1300 → calls /api/create-payment with price 1300
+- Lifetime $2400 → calls /api/create-payment with price 2400
+- Buttons redirect user to invoice URL
+
+---
+
+10. Telegram contact:
+
+- Add link: <a href="https://t.me/naylou">@naylou</a>
+
+---
+
+Extra notes:
+
+- Hash passwords with bcrypt
+- Use NOWPayments API key server-side only
+- MongoDB stores users, plans, and payment status
+- Simple, professional UI
+- Make dashboard responsive and easy to use
