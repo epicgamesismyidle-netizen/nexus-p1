@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "hGYrSHuqpq7SHZf2oHv1a"
+uri = "file://nexus-p1.tar.gz"
+type = "unspecified"
+title = "Nexus P1 — Full Project Archive"
