@@ -1,0 +1,21 @@
+packages:
+  "framer-motion": "For premium page transitions, scroll effects, and hover animations"
+  "react-hook-form": "For robust form state management"
+  "@hookform/resolvers": "For Zod schema validation in forms"
+  "zod": "For strict schema definitions"
+  "clsx": "For dynamic class merging"
+  "tailwind-merge": "For conflict-free tailwind class merging"
+
+images:
+  - path: "artifacts/saas-website/public/images/hero-glow.png"
+    description: "Abstract glowing mesh gradient in deep neon violet and electric blue on a pure black background. Cinematic, high-end, smooth, dark mode, tech aesthetic."
+    aspect_ratio: "16:9"
+  - path: "artifacts/saas-website/public/images/logo.png"
+    description: "Minimalist sleek geometric abstract logo mark, glowing purple accent, dark tech vibe, on transparent background."
+    aspect_ratio: "1:1"
+
+notes:
+  - Application assumes React Query hooks for API are available in @workspace/api-client-react
+  - Forms are strictly validated against the API specifications
+  - Protected routes handle redirection gracefully via wouter
+  - The payment flow creates an invoice via the API and redirects the user externally
